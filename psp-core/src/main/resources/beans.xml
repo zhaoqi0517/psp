@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+    <bean id="redisSentinelNode1" class="org.springframework.data.redis.connection.RedisNode">
+        <constructor-arg name="host" value="${redis.sentinel.node1.host}" />
+        <constructor-arg name="port" value="${redis.sentinel.node1.port}" />
+    </bean>
+    <bean id="redisSentinelNode2" class="org.springframework.data.redis.connection.RedisNode">
+        <constructor-arg name="host" value="${redis.sentinel.node2.host}" />
+        <constructor-arg name="port" value="${redis.sentinel.node2.port}" />
+    </bean>
+    <bean id="redisSentinelNode3" class="org.springframework.data.redis.connection.RedisNode">
+        <constructor-arg name="host" value="${redis.sentinel.node3.host}" />
+        <constructor-arg name="port" value="${redis.sentinel.node3.port}" />
+    </bean>
+    <bean id="redisMasterNode4" class="org.springframework.data.redis.connection.RedisNode">
+        <property name="name" value="${redis.master.node1.name}" />
+    </bean>
+
+    <bean id="redisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory" p:usePool="true">
+        <property name="poolConfig" ref="jedisPoolConfig" />
+        <property name="password" value="${redis.master.password}" />
+    </bean>
+
+    <bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
+        <property name="connectionFactory" ref="redisConnectionFactory" />
+        <property name="keySerializer" ref="stringSerializer" />
+        <property name="valueSerializer" ref="jsonSerializer" />
+        <property name="defaultSerializer" ref="jsonSerializer" />
+    </bean>
+
+    <bean id="jsonSerializer" class="org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer" />
+    <bean id="stringSerializer" class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+
+    <bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+        <property name="maxTotal" value="200" />
+        <property name="maxIdle" value="30" />
+        <property name="maxWaitMillis" value="30000" />
+        <property name="testOnBorrow" value="false" /><!-- 向调用者输出“链接”资源时，是否检测是有有效，如果无效则从连接池中移除，并尝试获取继续获取。设为true，一个挂都不能用 -->
+        <property name="testOnReturn" value="true" /><!-- 向连接池“归还”链接时，是否检测“链接”对象的有效性。 -->
+    </bean>
+</beans>
