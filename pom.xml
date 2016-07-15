@@ -12,6 +12,7 @@
         <spring-web-version>3.2.13.RELEASE</spring-web-version>
         <jedis-version>2.7.2</jedis-version>
     </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -37,8 +38,19 @@
         </dependencies>
     </dependencyManagement>
 
+    <build>
+
+    <plugins>
+        <plugin>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-maven-plugin</artifactId>
+            <version>9.0.2.v20130417</version>
+        </plugin>
+    </plugins>
+    </build>
     <modules>
         <module>psp-core</module>
         <module>psp-web</module>
     </modules>
+
 </project>
