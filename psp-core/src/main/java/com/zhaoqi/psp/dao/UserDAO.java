@@ -1,18 +1,18 @@
 package com.zhaoqi.psp.dao;
 
+import com.zhaoqi.psp.domain.User;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
 /**
  * Created by zhaoqi on 12/11/2017.
  */
-public class UserDAO {
+public interface UserDAO {
 
-    private String name;
+    public void saveUser(User user);
 
-    public String getName() {
-        return "Hello," +  name;
-    }
+    public List<User> getUsers();
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
+    public int removeUser(String id);
 }

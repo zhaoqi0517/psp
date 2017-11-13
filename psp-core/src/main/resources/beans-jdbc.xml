@@ -2,65 +2,41 @@
 
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
        xsi:schemaLocation="
       http://www.springframework.org/schema/beans
       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-      http://www.springframework.org/schema/context
-      http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+      http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+      http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd ">
 
-    <context:property-placeholder location="classpath:sys.properties" />
-    <context:component-scan base-package="com.zhaoqi.psp" />
-
-    <bean id="redisSentinelNode1" class="org.springframework.data.redis.connection.RedisNode">
-        <constructor-arg name="host" value="${redis.sentinel.node1.host}" />
-        <constructor-arg name="port" value="${redis.sentinel.node1.port}" />
-    </bean>
-    <bean id="redisSentinelNode2" class="org.springframework.data.redis.connection.RedisNode">
-        <constructor-arg name="host" value="${redis.sentinel.node2.host}" />
-        <constructor-arg name="port" value="${redis.sentinel.node2.port}" />
-    </bean>
-    <!--<bean id="redisSentinelNode3" class="org.springframework.data.redis.connection.RedisNode">-->
-        <!--<constructor-arg name="host" value="${redis.sentinel.node3.host}" />-->
-        <!--<constructor-arg name="port" value="${redis.sentinel.node3.port}" />-->
-    <!--</bean>-->
-    <bean id="redisMasterNode4" class="org.springframework.data.redis.connection.RedisNode">
-        <property name="name" value="${redis.master.node1.name}" />
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="${jdbc.driverClassName}" />
+        <property name="url" value="${jdbc.url}" />
+        <property name="username" value="${jdbc.username}" />
+        <property name="password" value="${jdbc.password}" />
     </bean>
 
-    <bean id="redisSentinelConfiguration" class="org.springframework.data.redis.connection.RedisSentinelConfiguration">
-        <property name="master" ref="redisMasterNode4" />
-        <property name="sentinels">
-            <list>
-                <ref bean="redisSentinelNode1" />
-                <ref bean="redisSentinelNode2" />
-            </list>
-        </property>
-    </bean>
-    <bean id="redisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
-        <constructor-arg name="sentinelConfig" ref="redisSentinelConfiguration" />
-        <constructor-arg name="poolConfig" ref="jedisPoolConfig" />
-        <property name="usePool" value="true" />
-        <property name="password" value="${redis.master.password}" />
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
     </bean>
 
-    <bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
-        <property name="connectionFactory" ref="redisConnectionFactory" />
-        <property name="keySerializer" ref="stringSerializer" />
-        <property name="valueSerializer" ref="jsonSerializer" />
-        <property name="defaultSerializer" ref="jsonSerializer" />
-    </bean>
+    <tx:advice id="dataAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="insert*" propagation="REQUIRED" isolation="READ_COMMITTED"/>
+            <tx:method name="delete*" propagation="REQUIRED" isolation="READ_COMMITTED"/>
+            <tx:method name="update*" propagation="REQUIRED" isolation="READ_COMMITTED"/>
+            <tx:method name="save*" propagation="REQUIRED" isolation="READ_COMMITTED"/>
+            <tx:method name="edit*" propagation="REQUIRED" isolation="READ_COMMITTED"/>
+            <tx:method name="add*" propagation="REQUIRED" isolation="READ_COMMITTED"/>
+            <tx:method name="select*" propagation="SUPPORTS" isolation="READ_COMMITTED"/>
+            <tx:method name="query*" propagation="SUPPORTS" isolation="READ_COMMITTED"/>
+            <tx:method name="get*" propagation="SUPPORTS" isolation="READ_COMMITTED"/>
+        </tx:attributes>
+    </tx:advice>
 
-    <bean id="jsonSerializer" class="org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer" />
-    <bean id="stringSerializer" class="org.springframework.data.redis.serializer.StringRedisSerializer" />
-
-    <bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
-        <property name="maxTotal" value="200" />
-        <property name="maxIdle" value="30" />
-        <property name="maxWaitMillis" value="30000" />
-        <property name="testOnBorrow" value="${redis.test.borrow}" /><!-- 向调用者输出“链接”资源时，是否检测是有有效，如果无效则从连接池中移除，并尝试获取继续获取。设为true，一个挂都不能用 -->
-        <property name="testOnReturn" value="${redis.test.return}" /><!-- 向连接池“归还”链接时，是否检测“链接”对象的有效性。 -->
-    </bean>
-
-
+    <aop:config>
+        <aop:pointcut id="dataPointcut" expression="execution(* com.zhaoqi.psp.*.impl.*.*(..))" />
+        <aop:advisor pointcut-ref="dataPointcut" advice-ref="dataAdvice" />
+    </aop:config>
 </beans>

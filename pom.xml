@@ -11,6 +11,8 @@
         <spring-data-redis-version>1.7.2.RELEASE</spring-data-redis-version>
         <spring-web-version>3.2.13.RELEASE</spring-web-version>
         <jedis-version>2.7.2</jedis-version>
+        <jackson-core-version>2.7.3</jackson-core-version>
+        <mysql-driver-version>5.1.8</mysql-driver-version>
     </properties>
 
     <dependencyManagement>
@@ -35,6 +37,32 @@
             <artifactId>spring-data-redis</artifactId>
             <version>${spring-data-redis-version}</version>
         </dependency>
+            <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${jackson-core-version}</version>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson-core-version}</version>
+            </dependency>
+
+            <!-- MySQL database driver -->
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql-driver-version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-jdbc</artifactId>
+                <version>${spring-core-version}</version>
+                <scope>compile</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -45,6 +73,12 @@
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-maven-plugin</artifactId>
             <version>9.0.2.v20130417</version>
+            <configuration>
+                <contextPath>/</contextPath>
+                <webAppSourceDirectory>${project.basedir}/psp-web/target/psp-web</webAppSourceDirectory>
+                <classesDirectory>${project.basedir}/psp-core/target/classes</classesDirectory>
+                <!--<webAppXml>${project.basedir}/psp-web/src/main/webapp/WEB-INF/</webAppXml>-->
+            </configuration>
         </plugin>
     </plugins>
     </build>
