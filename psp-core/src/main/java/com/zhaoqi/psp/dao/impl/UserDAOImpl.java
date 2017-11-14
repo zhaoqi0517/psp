@@ -3,6 +3,7 @@ package com.zhaoqi.psp.dao.impl;
 import com.zhaoqi.psp.dao.UserDAO;
 import com.zhaoqi.psp.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
@@ -14,7 +15,7 @@ import java.util.List;
 /**
  * Created by qi on 17-11-13.
  */
-@Service
+@Repository
 public class UserDAOImpl implements UserDAO {
 
     @Autowired
@@ -22,7 +23,7 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public void saveUser(User user) {
-        String query = "insert into Employee (id, name, role) values (?,?,?)";
+        String query = "insert into t_user (f_id, f_name, f_role) values (?,?,?)";
         Connection con = null;
         PreparedStatement ps = null;
         try{
