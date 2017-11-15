@@ -9,7 +9,7 @@ public class Part implements Serializable{
 
     private byte[] content;
     private String name;
-    private static final Part NULL = new Part();
+    public static final Part NULL = new Part();
 
     public Part() {
         this(null, null);

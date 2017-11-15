@@ -16,6 +16,13 @@
         <apache-common-codes-version>1.8.</apache-common-codes-version>
         <apache-http-component-version>4.2.5</apache-http-component-version>
     </properties>
+    <repositories>
+        <repository>
+            <id>sf-private-reponsitory</id>
+            <name>SF private repository</name>
+            <url>http://nexus.sf-express.com/nexus/content/groups/public/</url>
+        </repository>
+    </repositories>
 
     <dependencyManagement>
         <dependencies>
@@ -32,7 +39,7 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-web</artifactId>
-                <version>${spring-web-version}</version>
+                <version>${spring-core-version}</version>
             </dependency>
         <dependency>
             <groupId>org.springframework.data</groupId>
@@ -71,11 +78,21 @@
                 <artifactId>spring-aspects</artifactId>
                 <version>${spring-core-version}</version>
             </dependency>
-           <dependency>
-			<groupId>commons-codec</groupId>
-			<artifactId>commons-codec</artifactId>
-			<version>${apache-common-codes-version}</version>
+<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<version>${spring-core-version}</version>
 		</dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context</artifactId>
+                <version>${spring-core-version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context-support</artifactId>
+                <version>${spring-core-version}</version>
+            </dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
@@ -94,6 +111,23 @@
 			<version>${apache-http-component-version}</version>
 			<scope>compile</scope>
 		</dependency>
+           <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${spring-core-version}</version>
+            <scope>test</scope>
+        </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.12</version>
+                <scope>test</scope>
+            </dependency>
+               <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.5</version>
+        </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -105,7 +139,7 @@
             <artifactId>jetty-maven-plugin</artifactId>
             <version>9.0.2.v20130417</version>
             <configuration>
-                <contextPath>/</contextPath>
+                <contextPath>/psp</contextPath>
                 <webAppSourceDirectory>${project.basedir}/psp-web/target/psp-web</webAppSourceDirectory>
                 <classesDirectory>${project.basedir}/psp-core/target/classes</classesDirectory>
                 <!--<webAppXml>${project.basedir}/psp-web/src/main/webapp/WEB-INF/</webAppXml>-->
