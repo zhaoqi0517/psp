@@ -15,18 +15,18 @@ import org.springframework.web.client.RestTemplate;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:/beans.xml"})
-public class AppTest 
-    extends TestCase
+public class AppTest
+        extends TestCase
 {
     /**
      * Rigourous Test :-)
      */
 
     @org.junit.Test
-    public void testApp()
-    {RestTemplate restTemplate = new RestTemplate();
-        restTemplate
-        assertTrue( true );
+    public void testApp() {
+        RestTemplate restTemplate = new RestTemplate();
+        String rs = restTemplate.getForObject("http://localhost:8080/upload", String.class);
+        assertTrue("OK".equals(rs));
 
         //UploadFileService ufs = new UploadFileService("/home/qi/Pictures/IMG_4280.JPG");
         //ufs.setMaxRead(5);
