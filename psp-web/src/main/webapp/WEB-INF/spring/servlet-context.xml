@@ -17,8 +17,51 @@
     </bean>
 
     <bean id="jsonMessageConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter" >
-
     </bean>
+
+    <bean name="handlerAdapter"
+          class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+        <property name="webBindingInitializer">
+            <bean class="org.springframework.web.bind.support.ConfigurableWebBindingInitializer">
+                <property name="conversionService">
+                    <bean class="org.springframework.format.support.FormattingConversionServiceFactoryBean" />
+                </property>
+            </bean>
+        </property>
+        <property name="messageConverters">
+            <list>
+                <ref bean="jsonMessageConverter" />
+                <bean class="org.springframework.http.converter.StringHttpMessageConverter" />
+                <bean class="org.springframework.http.converter.ResourceHttpMessageConverter" />
+            </list>
+        </property>
+    </bean>
+    <bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+        <property name="order" value="1" />
+        <property name="defaultViews">
+            <list>
+                <bean class="org.springframework.web.servlet.view.json.MappingJackson2JsonView" />
+            </list>
+        </property>
+    </bean>
+
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="order" value="2" />
+        <property name="prefix" value="/WEB-INF/jsp" />
+        <property name="suffix" value=".jsp" />
+    </bean>
+
+    <bean name="handlerMapping" class="com.zhaoqi.psp.action.ActionHandler">
+        <property name="interceptors">
+            <list>
+                <bean class="com.zhaoqi.psp.aop.AuthCheckInterceptor" />
+                <bean class="com.zhaoqi.psp.aop.ViewInterceptor">
+                    <property name="defaultLayout" value="/common/layout" />
+                </bean>
+            </list>
+        </property>
+    </bean>
+    <mvc:resources mapping="/resources/**" location="/resources/" />
     <!-- bug 2  注释掉之后,请求无法到达-->
    <context:component-scan base-package="com.zhaoqi.psp.action" />
 </beans>

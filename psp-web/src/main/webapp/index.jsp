@@ -15,5 +15,6 @@
         userSvc.save(user);
         %>
     <%=user.getName()%></h2>
+<%response.sendRedirect("/entry/index.jsp");%>
 </body>
 </html>
