@@ -71,6 +71,9 @@
     <listener>
         <listener-class>com.zhaoqi.psp.listener.WebAppListener</listener-class>
     </listener>
+    <listener>
+        <listener-class>com.zhaoqi.psp.listener.SessionListener</listener-class>
+    </listener>
 
 
 </web-app>

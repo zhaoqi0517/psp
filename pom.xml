@@ -15,6 +15,8 @@
         <mysql-driver-version>5.1.8</mysql-driver-version>
         <apache-common-codes-version>1.8.</apache-common-codes-version>
         <apache-http-component-version>4.2.5</apache-http-component-version>
+        <mybatis.version>3.2.2</mybatis.version>
+        <mybatis.spring.version>1.2.0</mybatis.spring.version>
     </properties>
     <repositories>
         <repository>
@@ -133,6 +135,17 @@
                 <artifactId>commons-beanutils</artifactId>
                 <version>1.9.2</version>
             </dependency>
+            <!-- Mybatis -->
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis</artifactId>
+                <version>${mybatis.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis-spring</artifactId>
+                <version>${mybatis.spring.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -144,7 +157,7 @@
             <artifactId>jetty-maven-plugin</artifactId>
             <version>9.0.2.v20130417</version>
             <configuration>
-                <contextPath>/psp</contextPath>
+                <contextPath>/</contextPath>
                 <webAppSourceDirectory>${project.basedir}/psp-web/target/psp-web</webAppSourceDirectory>
                 <classesDirectory>${project.basedir}/psp-core/target/classes</classesDirectory>
                 <!--<webAppXml>${project.basedir}/psp-web/src/main/webapp/WEB-INF/</webAppXml>-->

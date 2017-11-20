@@ -4,11 +4,13 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:tx="http://www.springframework.org/schema/tx"
        xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
        xsi:schemaLocation="
       http://www.springframework.org/schema/beans
       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
-      http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd ">
+      http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+      http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd ">
 
     <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
         <property name="driverClassName" value="${jdbc.driverClassName}" />
@@ -16,27 +18,78 @@
         <property name="username" value="${jdbc.username}" />
         <property name="password" value="${jdbc.password}" />
     </bean>
+    <jdbc:initialize-database data-source="dataSource" ignore-failures="DROPS">
+        <jdbc:script location="classpath:schema.sql" />
+    </jdbc:initialize-database>
 
+    <!-- transaction manager, use JtaTransactionManager for global tx -->
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-        <property name="dataSource" ref="dataSource"/>
+        <property name="dataSource" ref="dataSource" />
     </bean>
 
-    <tx:advice id="dataAdvice" transaction-manager="transactionManager">
-        <tx:attributes>
-            <tx:method name="insert*" propagation="REQUIRED" isolation="READ_COMMITTED"/>
-            <tx:method name="delete*" propagation="REQUIRED" isolation="READ_COMMITTED"/>
-            <tx:method name="update*" propagation="REQUIRED" isolation="READ_COMMITTED"/>
-            <tx:method name="save*" propagation="REQUIRED" isolation="READ_COMMITTED"/>
-            <tx:method name="edit*" propagation="REQUIRED" isolation="READ_COMMITTED"/>
-            <tx:method name="add*" propagation="REQUIRED" isolation="READ_COMMITTED"/>
-            <tx:method name="select*" propagation="SUPPORTS" isolation="READ_COMMITTED"/>
-            <tx:method name="query*" propagation="SUPPORTS" isolation="READ_COMMITTED"/>
-            <tx:method name="get*" propagation="SUPPORTS" isolation="READ_COMMITTED"/>
-        </tx:attributes>
-    </tx:advice>
+    <!-- define the SqlSessionFactory -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="configLocation" value="classpath:beans-jdbc.xml" />
+        <property name="plugins">
+            <array>
+                <bean class="com.zhaoqi.psp.aop.MybatisInterceptor" />
+            </array>
+        </property>
+    </bean>
 
-    <aop:config>
-        <aop:pointcut id="dataPointcut" expression="execution(* com.zhaoqi.psp.*.impl.*.*(..))" />
-        <aop:advisor pointcut-ref="dataPointcut" advice-ref="dataAdvice" />
-    </aop:config>
+    <!-- 自定义Dao扫描。注册并组装。 -->
+    <bean class="com.zhaoqi.psp.dao.DaoScanner">
+        <property name="basePackage" value="com.zhaoqi.*.dao" />
+        <property name="excludeFilters">
+            <set>
+                <value><![CDATA[.*(?<!Dao)$]]></value>
+                <value><![CDATA[.*UtilDao$]]></value>
+            </set>
+        </property>
+    </bean>
+    <bean id="basicDAO" class="com.zhaoqi.psp.dao.impl.BasicDAOImpl">
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+
+    <aop:aspectj-autoproxy>
+        <aop:include name="daoInterceptor" />
+    </aop:aspectj-autoproxy>
+    <bean id="daoInterceptor" class="com.zhaoqi.psp.aop.DAOInterceptor" />
+
+    <bean id="daoHandler" class="com.zhaoqi.psp.dao.impl.Handlers">
+        <property name="handlers">
+            <list>
+                <bean class="com.zhaoqi.psp.dao.impl.PreHandler" />
+                <bean class="com.zhaoqi.psp.dao.impl.PaginationHandler">
+                    <property name="dialect">
+                        <bean class="com.zhaoqi.psp.dao.impl.LimitOffsetDialect" />
+                    </property>
+                </bean>
+                <bean class="com.zhaoqi.psp.dao.impl.AutoSqlHandler" />
+            </list>
+        </property>
+    </bean>
+    <!--<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">-->
+        <!--<property name="dataSource" ref="dataSource"/>-->
+    <!--</bean>-->
+
+    <!--<tx:advice id="dataAdvice" transaction-manager="transactionManager">-->
+        <!--<tx:attributes>-->
+            <!--<tx:method name="insert*" propagation="REQUIRED" isolation="READ_COMMITTED"/>-->
+            <!--<tx:method name="delete*" propagation="REQUIRED" isolation="READ_COMMITTED"/>-->
+            <!--<tx:method name="update*" propagation="REQUIRED" isolation="READ_COMMITTED"/>-->
+            <!--<tx:method name="save*" propagation="REQUIRED" isolation="READ_COMMITTED"/>-->
+            <!--<tx:method name="edit*" propagation="REQUIRED" isolation="READ_COMMITTED"/>-->
+            <!--<tx:method name="add*" propagation="REQUIRED" isolation="READ_COMMITTED"/>-->
+            <!--<tx:method name="select*" propagation="SUPPORTS" isolation="READ_COMMITTED"/>-->
+            <!--<tx:method name="query*" propagation="SUPPORTS" isolation="READ_COMMITTED"/>-->
+            <!--<tx:method name="get*" propagation="SUPPORTS" isolation="READ_COMMITTED"/>-->
+        <!--</tx:attributes>-->
+    <!--</tx:advice>-->
+
+    <!--<aop:config>-->
+        <!--<aop:pointcut id="dataPointcut" expression="execution(* com.zhaoqi.psp.*.impl.*.*(..))" />-->
+        <!--<aop:advisor pointcut-ref="dataPointcut" advice-ref="dataAdvice" />-->
+    <!--</aop:config>-->
 </beans>

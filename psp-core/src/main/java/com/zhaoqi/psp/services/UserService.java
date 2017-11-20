@@ -1,5 +1,6 @@
 package com.zhaoqi.psp.services;
 
+import com.zhaoqi.psp.domain.LoginData;
 import com.zhaoqi.psp.domain.User;
 
 /**
@@ -9,4 +10,6 @@ import com.zhaoqi.psp.domain.User;
 public interface UserService {
 
     public void save(User user);
+
+    public User login(LoginData data) throws Exception;
 }

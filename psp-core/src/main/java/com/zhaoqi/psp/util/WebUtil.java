@@ -110,11 +110,7 @@ public class WebUtil {
 		}
 	}
 
-	/**
-	 * 如果以redirect:开头，则判断为redirect。
-	 * @param path
-	 * @return
-	 */
+
 	public static boolean isRedirect(String path) {
 		return REDIRECT_URL_PREFIX.equals(getPrefix(path));
 	}

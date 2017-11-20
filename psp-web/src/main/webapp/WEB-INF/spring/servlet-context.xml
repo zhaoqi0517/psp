@@ -6,18 +6,27 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <mvc:annotation-driven />
+    <mvc:annotation-driven >
+        <mvc:message-converters>
+            <ref bean="jackson2Converter" />
+        </mvc:message-converters>
+            </mvc:annotation-driven>
 
     <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
         <property name="messageConverters">
             <list>
-                <ref bean="jsonMessageConverter" />
+                <ref bean="jackson2Converter" />
             </list>
         </property>
     </bean>
+    <bean id="jackson2Converter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter" >
+        <property name="supportedMediaTypes">
+            <list>
+                <value>text/html;charset=UTF-8</value>
+            </list>
+        </property>
+            </bean>
 
-    <bean id="jsonMessageConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter" >
-    </bean>
 
     <bean name="handlerAdapter"
           class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
@@ -30,7 +39,7 @@
         </property>
         <property name="messageConverters">
             <list>
-                <ref bean="jsonMessageConverter" />
+                <ref bean="jackson2Converter" />
                 <bean class="org.springframework.http.converter.StringHttpMessageConverter" />
                 <bean class="org.springframework.http.converter.ResourceHttpMessageConverter" />
             </list>

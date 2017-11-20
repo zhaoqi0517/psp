@@ -1,8 +1,12 @@
 package com.zhaoqi.psp.services.impl;
 
 import com.zhaoqi.psp.dao.UserDAO;
+import com.zhaoqi.psp.domain.LoginData;
 import com.zhaoqi.psp.domain.User;
+import com.zhaoqi.psp.exception.ServiceException;
 import com.zhaoqi.psp.services.UserService;
+import com.zhaoqi.psp.util.AppUtil;
+import com.zhaoqi.psp.util.BeanUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -35,6 +39,25 @@ public class UserServiceImpl implements UserService {
     public void setName(String name) {
         this.name = name;
         listOps.leftPush("name", this.name);
+    }
+
+    public User login(LoginData data) throws Exception {
+
+        LoginData condition = BeanUtil.copy(data);
+
+        String password = condition.getPassword();
+        condition.setPassword(AppUtil.getMD5(password));
+
+        PaginationCondition pc = new PaginationCondition();
+        pc.setLimit(10);
+        userDAO.find(pc);
+
+        User user = userDAO.find(condition);
+        if (user == null) {
+            throw new ServiceException("exception.service.loginfailed", null);
+        }
+
+        return user;
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.zhaoqi.psp.dao.impl;
 
 import com.zhaoqi.psp.dao.UserDAO;
 import com.zhaoqi.psp.domain.User;
+import org.mybatis.spring.support.SqlSessionDaoSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
@@ -16,7 +17,7 @@ import java.util.List;
  * Created by qi on 17-11-13.
  */
 @Repository
-public class UserDAOImpl implements UserDAO {
+public class UserDAOImpl extends SqlSessionDaoSupport implements UserDAO {
 
     @Autowired
     private DataSource dataSource;
@@ -52,6 +53,7 @@ public class UserDAOImpl implements UserDAO {
     public List<User> getUsers() {
         return null;
     }
+
 
     @Override
     public int removeUser(String id) {
